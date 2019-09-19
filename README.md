@@ -63,13 +63,21 @@ The following is a description of these files, in an order most appropriate to d
 
 # import.py / books.csv
 
-This is a very short and simple application that uses sqlalchemy (flasks library that speaks to your database for you) to take the data from books.csv and upload it to the postgresql database in the format above. 
+import.py is a short python script that can be run from the command line. It takes all of the information in books.csv and inserts it entry by entry into the database's books table. The script need only be run once after the initial setup of the database and the application will then have all the information it requires to render each of the individual application pages. 
 
 # application.py
 
-The workhorse of the site, this is the python application that does all of the legwork behind the scenes to talk to the browser making requests and the database that stores all the deets. The app is broken down into several routes that each speaks to one (or more) of the HTML templates stored in the templates folder. For simplicity and structure an expanation of each route will be given as part of the discussion of each respective html template.
+This is the primary backend script for the application and utilises the Flask web application microframework. The script starts as you would expect by loading the required dependencies and libraries. Next, are checks to ensure the necessary environment variables are set, and then variables created to start the sqlalchemy session that allows the application to 'speak' to the database. Following this is a 'login decorator' - this is a 'shortcut' of sorts that inserts the two lines of code:
+```
+if session.get("user_id") is None:
+    return redirect("/login")
+```
+at the top of any function preceeded by the decorator `@login_required`. As should hopefully be obvious from at least the choice of name, this requres that the user be logged in (or more specifically that the "user_id" variable within the users session is set) for any of the functions it preceeds. 
 
-The file starts by importing all of the required libraries and functions that are used in the application followed by a couple of statements configuring the database and app. Then follows a "decorated function" for those app routes requiring a login - this is basically a fancy way of saving the need to have the same 3 lines of code at the beggining of the routes that require a user to be logged in. All of the application routes then follow.
+The remaining structure of the script is broken down into several routes through which the HTML reqests are directed. With the exception of the 'api' route, there is a 1 to 1 correspondence between the application routes and the HTML templates in the /templates directory. As such, the following is a brief description of each route which corresponds with a html template of the same name:
+
+<h3>index</h3>
+This is the default page of the application. Provided the 
 
 # run_app.sh
 
