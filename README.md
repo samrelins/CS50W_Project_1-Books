@@ -1,8 +1,9 @@
-# Books & Stuff
+# Books n' That
 
-Books and stuff is a thrilling book review website. You can create an account an leave a reviews for any of 5000 books stored in the sites bowels. "Bowels" refers more specifically to the site's postgresql database which contains tables for each of the aforementioned books, the site's users and the reveiws left by said users for said books. Simple.
+Books n' That is an implementation of a simple book reveiew website using a python/flask backend and a basic HTML/jinja frontend with a bit of bootstrap CSS styling thrown in for good measure.  
 
-The schema (or organisation) of the database looks like this:
+The site depends on a pre-configured postgresql database, which it stays in contact with via sqlalchemy. The applciation requires a database schema as follows:
+
 ```
                Table "public.books"
  Column |  Type   | Collation | Nullable | Default
@@ -28,18 +29,11 @@ The schema (or organisation) of the database looks like this:
  email    | text   |           | not null |
 ```
 
-The database is hosted on heroku.com. Nice place. Highly reccomended. 
-
-The site itself is comprised of a python-based server with all the fancy stuff handled by a python micro-framework called flask. The rest is then handled by various HTML pages with the odd bit of jinja that talks to the flask/python app. The site is styled using some lovely bootstrap components and overall styling. 
+Note: Though sqlalchemy is a toolkit that includes extensive ORM tools, as an exercise this application is purposely executed using only raw SQL queries
 
 The project is laid out as follows:
 ```
 project1/
-├── application.py
-├── import.py
-├── books.csv
-├── requirements.txt
-├── run_app.sh
 ├── templates/
 │   ├── layout.html
 │   ├── register.html
@@ -49,6 +43,11 @@ project1/
 │   ├── search.html
 │   ├── book.html
 │   └── edit_review.html
+├── application.py
+├── books.csv
+├── import.py
+├── requirements.txt
+├── run_app.sh
 ├── static/
 │   └── bootstrap-3.3.7-dist
 │       ├── css 
@@ -60,21 +59,17 @@ project1/
 │   │   ├── etc....
 │   │   └── etc....
 ```
-the following are quick individual rundowns of each of the above files/directories/bags of fun:
+The following is a description of these files, in an order most appropriate to describe the logic behind the applicatoin:
+
+# import.py / books.csv
+
+This is a very short and simple application that uses sqlalchemy (flasks library that speaks to your database for you) to take the data from books.csv and upload it to the postgresql database in the format above. 
 
 # application.py
 
 The workhorse of the site, this is the python application that does all of the legwork behind the scenes to talk to the browser making requests and the database that stores all the deets. The app is broken down into several routes that each speaks to one (or more) of the HTML templates stored in the templates folder. For simplicity and structure an expanation of each route will be given as part of the discussion of each respective html template.
 
 The file starts by importing all of the required libraries and functions that are used in the application followed by a couple of statements configuring the database and app. Then follows a "decorated function" for those app routes requiring a login - this is basically a fancy way of saving the need to have the same 3 lines of code at the beggining of the routes that require a user to be logged in. All of the application routes then follow.
-
-# import.py / books.csv
-
-This is a very short and simple application that uses sqlalchemy (flasks library that speaks to your database for you) to take the data from books.csv and upload it to the postgresql database in the format above. 
-
-# requirements.txt
-
-This is a simple list of the various flask modules required for the app to work. Nothing particularly spectacular here, but this will be discussed in greater detail when talking about project1_env.
 
 # run_app.sh
 
