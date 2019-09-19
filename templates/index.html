@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Books
+{% endblock %}
+
+{% block link_ref %}
+    "logout"
+{% endblock %}
+
+{% block link %}
+    Logout
+{% endblock %}
+
+{% block body %}
+
+    <div class="jumbotron jumbotron m-5 p-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <form action="/search" method="POST">
+                    <div class="form-group">
+                        <h1 class="p-3">Search for a book</h1>
+                        <input type="text" class="form-control text-center" aria-describedby="searchHelp" name="book_search" placeholder="Enter title, author or ISBN">
+                    </div>
+                    <div class="row m-3">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary btn-block">Search</button>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

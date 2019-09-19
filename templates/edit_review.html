@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Books
+{% endblock %}
+
+{% block link_ref %}
+    "/logout"
+{% endblock %}
+
+{% block link %}
+    Logout
+{% endblock %}
+
+{% block body %}
+
+    <section class="jumbotron mt-3">
+        <div class="container">
+            <h1 class="display-4">{{ book.title }}</h1>
+            <h1 class="jumbotron-heading text-muted">{{ book.author }}</h2>
+            <h5 class="text-muted">Published: {{ book.year }}</h3>
+            <h5 class="text-muted">ISBN: {{ book.isbn }}</h3>
+            <br>
+            <h4 class="">Average rating {{ avg_rating }} from {{ ratings }} Goodreads ratings</h3>
+        </div>
+    </section>
+
+    <div class="album bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 px-3 py-3 pt-0">
+                    <div class="card-body">
+                        <h3>Your Blatherings:</h3>
+                        <p class="card-text">{{ user_review.review }}</p>
+                    </div>
+                    <form action="{{ url_for('edit_review', isbn=book.isbn) }}" method="POST">
+                        <div class="card-body form-group">
+                            <h3>Edit Your Blatherings</h3>
+                            <textarea class="form-control mt-3" rows="4" name="review"></textarea>
+                            <h5 class="mt-3">Rating:</h5>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="inlineRadio1" value="1">
+                                <label class="form-check-label" for="inlineRadio1">1</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="inlineRadio2" value="2">
+                                <label class="form-check-label" for="inlineRadio2">2</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="inlineRadio1" value="3">
+                                <label class="form-check-label" for="inlineRadio1">3</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="inlineRadio1" value="4">
+                                <label class="form-check-label" for="inlineRadio1">4</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="inlineRadio1" value="5">
+                                <label class="form-check-label" for="inlineRadio1">5</label>
+                            </div>
+                            <br>
+                            {% if error %}
+                                <h4 style="color: red" class="mt-3">{{ error }}</h4>
+                            {% endif %}
+                            <button type="submit" name="isbn" value="{{ book.isbn }}" class="btn btn-primary mt-3">Submit Review</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% for review in other_reviews %}
+                {% if loop.index % 3 == 1 %}
+                    <div class="row">
+                {% endif %}        
+                        <div class="col-lg-4">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <h5><strong>{{ review.username }}</strong></h5>
+                                    <p class="card-text">{{ review.review }}</p>
+                                </div>
+                            </div>
+                        </div>
+                {% if loop.index % 3 == 0 %}
+                    </div>
+                {% endif %}        
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="../../assets/js/vendor/popper.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <svg xmlns="http://www.w3.org/2000/svg" width="208" height="225" viewBox="0 0 208 225" preserveAspectRatio="none" style="display: none; visibility: hidden; position: absolute; top: -100%; left: -100%;"><defs><style type="text/css"></style></defs><text x="0" y="11" style="font-weight:bold;font-size:11pt;font-family:Arial, Helvetica, Open Sans, sans-serif">Thumbnail</text></svg><script src="../../assets/js/vendor/holder.min.js"></script>
+
+{% endblock %}
+

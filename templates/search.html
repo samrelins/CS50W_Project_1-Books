@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Books
+{% endblock %}
+
+{% block link_ref %}
+    "/logout"
+{% endblock %}
+
+{% block link %}
+    Logout
+{% endblock %}
+
+{% block body %}
+
+    <div class="jumbotron jumbotron m-5 p-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <form action="/search" method="POST">
+                    <div class="form-group">
+                        <h1 class="p-3">Search for a book</h1>
+                        <input type="text" class="form-control text-center" aria-describedby="searchHelp" name="book_search" placeholder="Enter title, author or ISBN">
+                    </div>
+                    <div class="row m-3">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary btn-block">Search</button>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {% if books %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ISBN</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Publication Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                    <tr>
+                        <td><a href="{{ url_for('book', isbn=book.isbn, error=None) }}">{{ book.isbn }}</a></td>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ book.year }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h3 class="text-center">Looks like we don't have that one....</h3>
+        <h3 class="text-center">Have another go sunshine</h3>
+    {% endif %}
+
+{% endblock %}
