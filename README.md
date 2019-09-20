@@ -1,8 +1,8 @@
 # Books n' That
 
-Books n' That is an implementation of a simple book reveiew website using a python/flask backend and a basic HTML/jinja frontend with a bit of bootstrap CSS styling thrown in for good measure.  
+Books n' That is an implementation of a simple book reveiew website. The appliactions uses a python/flask backend and a basic HTML/jinja frontend with a bit of bootstrap CSS styling thrown in for good measure.  
 
-The site depends on a pre-configured postgresql database, which it stays in contact with via sqlalchemy. The applciation requires a database schema as follows:
+The backend depends on a pre-configured postgresql database which it stays in contact with via sqlalchemy, with a schema s follows:
 
 ```
                Table "public.books"
