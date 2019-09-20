@@ -81,6 +81,7 @@ The HTML files all include Jinja script that is used to dictate the raw HTML tha
 The following is a brief description of each route and it's corresponding html file:
 
 <h3>login</h3>
+
 Unsurprisingly, this function allows existing users to log in. If the server receives a `POST` request at this address, it takes the information provided by the user and:
 <br>
 
@@ -94,6 +95,7 @@ Unsurprisingly, this function allows existing users to log in. If the server rec
 Again unsurprisingly, if the user submits a `GET` request the page just renders the login screen (without any error messages).
 
 <h3>register</h3>
+
 The register page allows users to register to use the site (shockingly) and is similar in spirit and functionality to the login page. If a `POST` request at theis message is received:
 <br>
 
