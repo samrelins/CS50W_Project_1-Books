@@ -61,13 +61,15 @@ project1/
 ```
 The following is a description of these files, in an order most appropriate to describe the logic behind the applicatoin:
 
-# import.py / books.csv
+<h2>import.py / books.csv</h2>
 
 import.py is a short python script that can be run from the command line. It takes all of the information in books.csv and inserts it entry by entry into the database's books table. The script need only be run once after the initial setup of the database and the application will then have all the information it requires to render each of the individual application pages. 
 
-# application.py
+<h2>application.py</h2>
 
-This is the primary backend script for the application and utilises the Flask web application microframework. The script starts as you would expect by loading the required dependencies and libraries. Next, are checks to ensure the necessary environment variables are set, and then variables created to start the sqlalchemy session that allows the application to 'speak' to the database. Following this is a 'login decorator' - this is a 'shortcut' of sorts that inserts the two lines of code:
+This is the primary backend script for the application and utilises the Flask web application microframework. 
+
+The script starts as you would expect by loading the required dependencies and libraries. Next, are checks to ensure the necessary environment variables are set, and then variables created to start the sqlalchemy session that allows the application to 'speak' to the database. Following this is a 'login decorator' - this is a 'shortcut' of sorts that inserts the two lines of code:
 ```
 if session.get("user_id") is None:
     return redirect("/login")
