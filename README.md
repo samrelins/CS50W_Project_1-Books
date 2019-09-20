@@ -74,10 +74,27 @@ if session.get("user_id") is None:
 ```
 at the top of any function preceeded by the decorator `@login_required`. As should hopefully be obvious from at least the choice of name, this requres that the user be logged in (or more specifically that the "user_id" variable within the users session is set) for any of the functions it preceeds. 
 
-The remaining structure of the script is broken down into several routes through which the HTML reqests are directed. With the exception of the 'api' route, there is a 1 to 1 correspondence between the application routes and the HTML templates in the /templates directory. As such, the following is a brief description of each route which corresponds with a html template of the same name:
+The remaining structure of the script is broken down into several 'routes' through which the HTML reqests are directed, facilitated by the flask `@app.route` decorator function. With the exception of the 'api' route, there is a html file corresponding to, and sharing a name with, each of the routes. Each route function dictates the information the server takes from the database and provides to the client and, in reverse, takes information sent from the client and adds it to the database. 
+
+The HTML files all include Jinja script that is used to dictate the raw HTML that is passed to the client each time the  Flask `render_template` function is called in application.py. Flask takes the information collected from the database (and any additional varables in the script) and uses it to render the html template according to the Jinja instrucitons in the html file.  
+
+The following is a brief description of each route and it's corresponding html file:
+
+<h3>login</h3>
+Unsurprisingly, this function allows existing users to log in. If the server receives a POST request at this address, it takes the information provided by the user and:
+
+  * checks that a username/password has been submitted
+  * searches for the user in the users table in the database
+  * checks the user exists, and that the password provided matches the hashed password in the database using Flask's `check_password_hash`
+  * if any of the above fail, the server returns the user to the login screen with an error message
+  * otherwise a session variable is created for the user to keep track of their activity whilst logged in
+  * sends logged in users to the index screen at `"/"`
+ 
+Again unsurprisingly, if the user submits a get request the page just renders the login screen (without any error messages).
+
 
 <h3>index</h3>
-This is the default page of the application. Provided the 
+This is the default page of the application. Provided the
 
 # run_app.sh
 
