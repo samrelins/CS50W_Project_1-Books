@@ -136,7 +136,7 @@ SQL lite then returns a list of up to 30 books matching the user's query, that i
 
 The `book` route is responsible for rendering book & user information when receiving a `GET` request, and inserting new reviews into the `reviews` table when a user submits a book review. The function is called with an `isbn` variable that is included as a "variable section" of the route's url; this is a common feature of flask applications - the `<string:isbn>` that follows `book/` in the URL of the `@app.route` decorator function effectively creates an individual URL for each isbn in the `books` table. The function then executes the following instructions:
 
-  * takes any information provided by the client if a `POST` request is submitted, checks for completeness, and inserts complete info into the `reviews` table or updates the `error` variable for incomplete submissions
+  * takes any information provided by the client if a `POST` request is submitted, checks for completeness and inserts complete info into the `reviews` table, or updates the `error` variable for incomplete submissions
   * queries the `books` table for the relevant book's information
   * submits a request to the goodreads API and extracts the `average_rating` and `work_ratings_count` features
   * queries the `reviews` table for reviews by the current user / other users and the average overall rating from all users
@@ -145,6 +145,27 @@ The `book` route is responsible for rendering book & user information when recei
 The `book.html` template includes the following features:
 <br>
   * The template checks if the user has already submitted a reveiw with `{% if user_review %}` - if so, the user's review is displayed with the option to edit it. Otherwise a form is displayed inviting the user to leave a review (and `{% if error %}` displays an error message if the user attempted to submit an incomplete review)
-  * If other users have submitted reviews, the `{% for review in other_reviews %}` statement separates out each individual `reveiw` entry and displays its information. 
+  * If other users have submitted reviews, the `{% for review in other_reviews %}` statement separates out each individual `reveiw` entry and displays its information, using the object returned by sqlalchemy from the `reviews` database.
   
 <h3>edit_review</h3>
+
+A user is only able to submit one review per book. As such, a separate route allows users to edit reviews they have already submitted. The functionality and logic, and the page layout is almost identical to the `book` route, except:
+<br>
+  * user's submissions are used to `UPDATE` the `reveiws` table rather than adding a new entry to it 
+  * the page displays the user's existing review as well as the form allowing the user to submit a new review
+  * other user's reviews are not displayed on the editing page
+  
+<h3>api</h3>
+
+The `api` route provides a simple way to query the application for raw data on a single book. Requests are subbmitted in the format `api/[insert ISBN here]'`. The function then queries the database for the ISBN provided and either returns an error 404 or a json object in the following format:
+```
+{
+  "author": "Betty Crocker", 
+  "average_score": 2.444444444444444, 
+  "isbn": "0307098222", 
+  "review_count": 9, 
+  "title": "Betty Crocker's Cookbook", 
+  "year": 1969
+}
+```
+  
