@@ -82,7 +82,7 @@ The HTML files all include Jinja script that is used to help customise the raw H
 
 <h3>layout.html</h3>
 
-A good example of this is the `layout.html` template, which comprises the header information to be included on each of the other HTML templates on the site. This information would otherwise need to be laboriously copy/pased onto each template and, if changed, laboriously copy/pasted over again. The Jinja script avoids this by the various `{% block \[variable\] %}{% endblock %}` tags, that instruct flask to insert "chunks" of HTML from the other template files into the corresponding space occupied by these tags.
+A good example of this is the `layout.html` template, which comprises the header information to be included on each of the other HTML templates on the site. This information would otherwise need to be laboriously copy/pased onto each template and, if changed, laboriously copy/pasted over again. The Jinja script avoids this by the various `{% block [variable] %}{% endblock %}` tags, that instruct flask to insert "chunks" of HTML from the other template files into the corresponding space occupied by these tags.
 
 The following is a brief description of each route and it's corresponding html template:
 
