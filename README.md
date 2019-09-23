@@ -1,8 +1,8 @@
 # Books n' That
 
-Books n' That is an implementation of a simple book reveiew website using a python/flask backend and a basic HTML/jinja frontend with a bit of bootstrap CSS styling thrown in for good measure.  
+Books n' That is an implementation of a simple book reveiew website. The appliactions uses a python/flask backend and a basic HTML/jinja frontend with a bit of bootstrap CSS styling thrown in for good measure.  
 
-The site depends on a pre-configured postgresql database, which it stays in contact with via sqlalchemy. The applciation requires a database schema as follows:
+The backend depends on a pre-configured postgresql database which it stays in contact with via sqlalchemy, with a schema s follows:
 
 ```
                Table "public.books"
@@ -61,80 +61,111 @@ project1/
 ```
 The following is a description of these files, in an order most appropriate to describe the logic behind the applicatoin:
 
-# import.py / books.csv
+<h2>import.py / books.csv</h2>
 
 import.py is a short python script that can be run from the command line. It takes all of the information in books.csv and inserts it entry by entry into the database's books table. The script need only be run once after the initial setup of the database and the application will then have all the information it requires to render each of the individual application pages. 
 
-# application.py
+<h2>application.py & HTML templates</h2>
 
-This is the primary backend script for the application and utilises the Flask web application microframework. The script starts as you would expect by loading the required dependencies and libraries. Next, are checks to ensure the necessary environment variables are set, and then variables created to start the sqlalchemy session that allows the application to 'speak' to the database. Following this is a 'login decorator' - this is a 'shortcut' of sorts that inserts the two lines of code:
+`applicatin.py` forms the primary python instructions for the application and utilises the Flask web application microframework. 
+
+The script starts as you would expect by loading the required dependencies and libraries. Next, are checks to ensure the necessary environment variables are set, and then variables created to start the sqlalchemy session that allows the application to 'speak' to the database. Following this is a 'login decorator' - this is a 'shortcut' of sorts that inserts the two lines of code:
 ```
 if session.get("user_id") is None:
     return redirect("/login")
 ```
 at the top of any function preceeded by the decorator `@login_required`. As should hopefully be obvious from at least the choice of name, this requres that the user be logged in (or more specifically that the "user_id" variable within the users session is set) for any of the functions it preceeds. 
 
-The remaining structure of the script is broken down into several routes through which the HTML reqests are directed. With the exception of the 'api' route, there is a 1 to 1 correspondence between the application routes and the HTML templates in the /templates directory. As such, the following is a brief description of each route which corresponds with a html template of the same name:
+The remaining structure of the script is broken down into several 'routes' through which the HTML reqests are directed, facilitated by the flask `@app.route` decorator function. With the exception of the 'api' route, there is a html file corresponding to, and sharing a name with, each of the routes. Each route function dictates the information the server takes from the database and provides to the client and, in the reverse direction, the information taken from the client and inserted into the database. 
+
+The HTML files all include Jinja script that is used to help customise the raw HTML that is passed to the client each time the Flask `render_template` function is called in application.py. Flask uses the instructions provided by the Jinja script in the HTML templates to render variable information in the HTML templates, such as the information provided by the routes in `application.py`. The result is that the need for thousands of individual raw HTML files, and the need to copy lots of identical HTML, is a avoided by allowing more variability in each of the HTML templates.
+
+<h3>layout.html</h3>
+
+A good example of this is the `layout.html` template, which comprises the header information to be included on each of the other HTML templates on the site. This information would otherwise need to be laboriously copy/pased onto each template and, if changed, laboriously copy/pasted over again. The Jinja script avoids this by the various `{% block [variable] %}{% endblock %}` tags, that instruct flask to insert "chunks" of HTML from the other template files into the corresponding space occupied by these tags.
+
+The following is a brief description of each route and it's corresponding html template:
+
+<h3>login</h3>
+
+Unsurprisingly, this function allows existing users to log in. If the server receives a `POST` request at this address, it takes the information provided by the user and:
+<br>
+
+  * checks that a username/password has been submitted
+  * queries the users table in the database for a matching user
+  * checks the user exists, and that the password provided matches the hashed password returned from the database using Flask's `check_password_hash`
+  * if any of the above fail, the server returns the login screen with an error message - the error message is rendered in the html template inside the `{% if error %}` Jinja tag
+  * otherwise a Flask `session` object is created for the server to keep track of the client's activity whilst logged in
+  * returns the index screen
+ 
+Again unsurprisingly, if the user submits a `GET` request the server just returns the login screen HTML (without any error messages).
+
+<h3>register</h3>
+
+The register page allows users to register to use the site (shockingly) and is similar in spirit and functionality to the login page. If a `POST` request is received:
+<br>
+
+  * the information is checked for completeness 
+  * password and confirmation are checked to ensure equality
+  * the database is queried for a user with the same username, in the hope the submitted username is not in use
+  * failure of the above returns the register page with an error - this is rendered using another Jinja `{% if error %}` tag
+  * the user's password is hashed with Flask's `generate_password_hash`
+  * the user's information is inserted into the users table in the database
+  * the new user record is queried from the database (as a new ID is created as each user is inserted) and the user ID set in the user's `session` object
+  * the server returns the index page
+  
+Again, a `GET` request just returns the register page HTML without any error.
+
+<h3>logout</h3>
+
+Logs the user out by calling the `clear` method of Flask's `session` object - functionally, this will prevent the server from recalling the user's login information should further request's come from the client device. A logut screen is then regturned to the client (actually called logged_out.html to avoid any semantic confusion).
 
 <h3>index</h3>
-This is the default page of the application. Provided the 
 
-# run_app.sh
+This is the default page of the application. Provided the user is logged in (see the info about the `@login_required` decorator above) the server simply returns a HTML page with a form asking the user to search for a book.
 
-This is a simple bash script that automatically sets the API and DATABASE_URL environment variables, activates the virtual environment in which the application runs and then runs the flask app. Basically, its a pain to keep having to perform each of these steps one by one before launching the server. 
+<h3>search</h3>
 
-Interesting aside: don't assume that running such a script is identical to inputting a command in the terminal - it works more like a running a program that exits once it reaches the end of the script. In other words, putting the line "export API_KEY=......" in a shell script then running it will simply set that environment variable for a split second while the script runs. It wont be retained once the script is exited. As such, the run_app.sh script works because it sets each of the environment variables and then runs flask straight away.
+Once a user submits an search it is routed as a `POST` request through the `search` route. 
 
-# Templates
+The function executes a SQL `LIKE()` query with the submitted search string to each of the `author` / `title` / `ISBN` features of the `books` table. The `LIKE()` operator is used in a similar vain to python's regular expressions, i.e. you submit a query using wildcard charachters to specify custom search perameters. This particular example is a really simple use of the `%` wildcard charachter at either end of the search string - this is a placeholder of zero or more charachters, allowing users to search for example "Harry Potter and the Philosopher's Stone" by simply typing "Potter". 
 
-Each template includes the html script that lays out the pages of the web application (with a bit of help from the css and js discussed later) and talks to one or more of the @routes in application.py 
+SQL lite then returns a list of up to 30 books matching the user's query, that is then passed to the `render` function along with the `search.html` template. The script in the `search.html` checks that the search returned any results using a simple Jinja `{% if books %}` operator: if so it creates a table and loops over the entries in books using `{% for book in books %}` to fill the entries in the table, if not just renders a script advising the user their search yielded no results.
 
-# layout.html
+<h3>book</h3>
 
-This is the basic skeleton of each of the pages of the application. It includes all of the basic structure that it would be a pain to have to keep repeating e.g. the metadata in the page head with the styling and the navbar at the top of each page. This file also nicely demonstrates jinja syntax in action. Tags are used to extend these elements of the template to create the individual pages of the site. These tags correspond with those on the other html pages to "plug in" the different sections of the site required to render the whole page.
+The `book` route is responsible for rendering book & user information when receiving a `GET` request, and inserting new reviews into the `reviews` table when a user submits a book review. The function is called with an `isbn` variable that is included as a "variable section" of the route's url; this is a common feature of flask applications - the `<string:isbn>` that follows `book/` in the URL of the `@app.route` decorator function effectively creates an individual URL for each isbn in the `books` table. The function then executes the following instructions:
 
-# register.html
+  * takes any information provided by the client if a `POST` request is submitted, checks for completeness and inserts complete info into the `reviews` table, or updates the `error` variable for incomplete submissions
+  * queries the `books` table for the relevant book's information
+  * submits a request to the goodreads API and extracts the `average_rating` and `work_ratings_count` features
+  * queries the `reviews` table for reviews by the current user / other users and the average overall rating from all users
+  * passes all this information to the `render_template` function, that render's the `book.html` template
+  
+The `book.html` template includes the following features:
+<br>
+  * The template checks if the user has already submitted a reveiw with `{% if user_review %}` - if so, the user's review is displayed with the option to edit it. Otherwise a form is displayed inviting the user to leave a review (and `{% if error %}` displays an error message if the user attempted to submit an incomplete review)
+  * If other users have submitted reviews, the `{% for review in other_reviews %}` statement separates out each individual `reveiw` entry and displays its information, using the object returned by sqlalchemy from the `reviews` database.
+  
+<h3>edit_review</h3>
 
-Unsurprisingly, this page allows a user to register with the site. The html is just a basic form that asks for the info required for registration and is served up when the user reaches this route via a GET request. The form then submits the info to the @register route as a POST request once completed, and the app adds the details to the database checking for any errors en-route. If any errors are detected, the register page is re-rendered with an error message saying what went wrong. Otherwise, the users details are added to the database, stored as a session and the user is directed to the index page.
+A user is only able to submit one review per book. As such, a separate route allows users to edit reviews they have already submitted. The functionality and logic, and the page layout is almost identical to the `book` route, except:
+<br>
+  * user's submissions are used to `UPDATE` the `reveiws` table rather than adding a new entry to it 
+  * the page displays the user's existing review as well as the form allowing the user to submit a new review
+  * other user's reviews are not displayed on the editing page
+  
+<h3>api</h3>
 
-# login.html
-
-Again, pretty obvious this one. The html displays a form asking for a username and password. This is taken from the form via a POST request to @login which checks the details agians the info in the database. If the details are correct, the users info is stored in the session and they are redirected to the login page. Otherwise the login screen is re-rendered and an error message displayed explaining the problem.
-
-# logged_out.html
-
-So obvious it hurts.
-
-# index.html
-
-The index page is the default (or "/") route. It's another basic form that asks the user for a search term. The search term is then passed to the app as a POST request to the @search route. 
-
-# search.html
-
-The search page is used to render the results of a book search. The search itself queries the database for any entries that have a similar author, title or ISBN to the users search. It then returns table data to the search page, which uses some jinja wizardry to render the results in a table using a for loop. Users can then select one of the entries in the table to be linked to the page for that individual book. If the search doesn't return any results, a jinja if / else statement checks for this and informs the user. 
-
-# book.html
-
-This is the meat of the site. The book page takes the isbn details of the book (stored in the url for the individual book page) and the application queries the database for the details of the book. It then renders the info for the book at the top of the screen. Alonside the details from the site's database, is info from the goodreads API showing the number of reviews and the average rating from the goodreads site. 
-
-Below this is the reviews section. If the user has already submitted a review, this is displayed at the top of this section along with the option to edit their submission. Otherwise a form is displayed asking for a text review and a rating out of 5. On submission this info is sent via the @review route which includes an ISBN reference using the format /review/"isbn". The application then takes the review via the @review route and adds it to the database and refreshes the book page. Now the user has submitted a review it is displayed at the top of the page.
-
-Below the user's review (or lack thereof) are any reviews submitted by other users and an average score. The data for the user reviews is fed into the page from the info in the database via the app's @book route and is formatted using some clever jinja. Note that the reviews are either displayed one on top of the other or in rows of three depending on what size device is being used. 
-
-# edit_review.html
-
-The edit review page is formatted identacally to the book page with the form submission present - just minus the other user reviews at the bottom and with an additional line at the top of the form showing the existing review to be edited. The user can then submit a replacement review in much the same way as they did the original. 
-
-Submissions are sent from the page to the @edit_review route. This checks for errors as usual and then updates the user's review entry in the database, returning the user to the relevant book page once complete. 
-
-# static
-
-One of the features of flask is that it looks for different parts of your web application in pretty specific places. Specifically, you need to tell flask exactly what the name of your pythong application file is (hence the FLASK_APP variable in the run_app.sh script), all of the html templates for your site need to be stored in a folder called "templates" and any css or javascript files need to go in a folder called static.
-
-To make life easy this site uses bootstrap for all its styling and whatnot and so the standard boostrap distribution files are found in the static folder for this app.
-
-# project1_env
-
-One of the 'quirks' of using python and flask to create web apps is that, often, a large number of additional add-on's or plugins are required to make things tick. When using python and flask in several different applications these can start to conflict with eachother and even the system itself causing untold frustration. 
-
-An easy way to overcome this issue is to create an environment in which your application opperates. This effectively 'isolates' your applicaton in its own little bubble - any plugins or additonal python modules you install will be kept separate from your underlying system and will only affect the running of your python program when inside that specific environment. The environment is activated as part of the run_app.sh script before flask is run, ensuring that all the gubbins specific to project1 are present as the server is initiated. Magic.
+The `api` route provides a simple way to query the application for raw data on a single book. Requests are subbmitted in the format `api/[insert ISBN here]'`. The function then queries the database for the ISBN provided and either returns an error 404 or a json object in the following format:
+```
+{
+  "author": "Betty Crocker", 
+  "average_score": 2.444444444444444, 
+  "isbn": "0307098222", 
+  "review_count": 9, 
+  "title": "Betty Crocker's Cookbook", 
+  "year": 1969
+}
+```
+  
