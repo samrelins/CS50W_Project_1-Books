@@ -65,9 +65,9 @@ The following is a description of these files, in an order most appropriate to d
 
 import.py is a short python script that can be run from the command line. It takes all of the information in books.csv and inserts it entry by entry into the database's books table. The script need only be run once after the initial setup of the database and the application will then have all the information it requires to render each of the individual application pages. 
 
-<h2>application.py</h2>
+<h2>application.py & HTML templates</h2>
 
-This is the primary backend script for the application and utilises the Flask web application microframework. 
+`applicatin.py` forms the primary python instructions for the application and utilises the Flask web application microframework. 
 
 The script starts as you would expect by loading the required dependencies and libraries. Next, are checks to ensure the necessary environment variables are set, and then variables created to start the sqlalchemy session that allows the application to 'speak' to the database. Following this is a 'login decorator' - this is a 'shortcut' of sorts that inserts the two lines of code:
 ```
@@ -76,11 +76,15 @@ if session.get("user_id") is None:
 ```
 at the top of any function preceeded by the decorator `@login_required`. As should hopefully be obvious from at least the choice of name, this requres that the user be logged in (or more specifically that the "user_id" variable within the users session is set) for any of the functions it preceeds. 
 
-The remaining structure of the script is broken down into several 'routes' through which the HTML reqests are directed, facilitated by the flask `@app.route` decorator function. With the exception of the 'api' route, there is a html file corresponding to, and sharing a name with, each of the routes. Each route function dictates the information the server takes from the database and provides to the client and, in reverse, takes information sent from the client and adds it to the database. 
+The remaining structure of the script is broken down into several 'routes' through which the HTML reqests are directed, facilitated by the flask `@app.route` decorator function. With the exception of the 'api' route, there is a html file corresponding to, and sharing a name with, each of the routes. Each route function dictates the information the server takes from the database and provides to the client and, in the reverse direction, the information taken from the client and inserted into the database. 
 
-The HTML files all include Jinja script that is used to dictate the raw HTML that is passed to the client each time the  Flask `render_template` function is called in application.py. Flask takes the information collected from the database (and any additional varables in the script) and uses it to render the html template according to the Jinja instrucitons in the html file.  
+The HTML files all include Jinja script that is used to help customise the raw HTML that is passed to the client each time the Flask `render_template` function is called in application.py. Flask uses the instructions provided by the Jinja script in the HTML templates to render variable information in the HTML templates, such as the information provided by the routes in `application.py`. The result is that the need for thousands of individual raw HTML files, and the need to copy lots of identical HTML, is a avoided by allowing more variability in each of the HTML templates.
 
-The following is a brief description of each route and it's corresponding html file:
+<h3>layout.html</h3>
+
+A good example of this is the `layout.html` template, which comprises the header information to be included on each of the other HTML templates on the site. This information would otherwise need to be laboriously copy/pased onto each template and, if changed, laboriously copy/pasted over again. The Jinja script avoids this by the various `{% block \[variable\] %}{% endblock %}` tags, that instruct flask to insert "chunks" of HTML from the other template files into the corresponding space occupied by these tags.
+
+The following is a brief description of each route and it's corresponding html template:
 
 <h3>login</h3>
 
