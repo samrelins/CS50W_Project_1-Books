@@ -40,7 +40,7 @@ def login():
     if request.method == "POST":
         username_or_email = request.form.get("username_or_email")
         if not username_or_email: 
-            error = "Enter username"
+            error = "Enter username / email"
             return render_template("login.html", error=error)
 
         password = request.form.get("password")
@@ -119,6 +119,7 @@ def search():
                             + "OR LOWER(title) LIKE LOWER(:search) "
                             + "OR LOWER(author) LIKE LOWER(:search) "
                             + "LIMIT 30", {'search':search}).fetchall()
+        print(type(books))
         return render_template("search.html", books=books)
 
     return redirect("/")
